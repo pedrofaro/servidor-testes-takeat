@@ -1,0 +1,28 @@
+{% extends "onshop_auto/formas_pagamento.html" %}
+
+
+
+          
+          {% block 'area_form' %}
+          <form role="form" id="templatemo-preferences-form" method="post" enctype="multipart/form-data">
+            <div class="row">
+              <div class="col-md-12 margin-bottom-15">
+                <label for="{{ form.atributos.id_for_label }}" class="control-label">Nome</label>
+                {{ form.nome }}
+                {{ form.nome.errors }}
+              </div>
+            </div>
+                
+              {% csrf_token %}
+            <div class="row templatemo-form-buttons">
+              <div class="col-md-12">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <button type="reset" class="btn btn-default">Limpar</button>
+              </div>
+            </div>
+          </form>
+          {% endblock 'area_form' %}
+
+
+
+  

@@ -1,0 +1,116 @@
+{% extends "onshop_core/index.html" %}
+
+
+{% block menu_admin %}
+  <div class="navbar navbar-inverse" role="navigation">
+      <div class="navbar-header">
+        <div class="logo"><h1>Takeat - Painel de Administração</h1></div>
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button> 
+      </div>   
+    </div>
+    <div class="template-page-wrapper">
+      <div class="navbar-collapse collapse templatemo-sidebar">
+        <ul class="templatemo-sidebar-menu">
+          <li><a href="{% url 'onshop_core:administrativo' %}"><i class="fa fa-home"></i>Painel</a></li>
+          
+          
+          <li class="sub open">
+          <a href="javascript:;">
+          <i class="fas fa-chart-pie" aria-hidden="true"></i>Relatórios <div class="pull-right"><span class="caret"></span>
+          </div>
+            </a>
+            <ul class="templatemo-submenu">
+              <li><a href="{% url 'onshop_auto:ver_relatorios' %}">Clientes</a></li>
+            </ul>
+          </li>
+
+          <li><a href="javascript:;" data-toggle="modal" data-target="#confirmModal"><i class="fas fa-sign-out-alt"></i>Sair</a></li>
+        </ul>
+      </div><!--/.navbar-collapse -->
+      {% endblock menu_admin %}
+
+{% block content_admin %}
+<h2 xmlns:b="http://www.w3.org/1999/html">Relatório de Clientes</h2>
+
+    <div class="col-3">
+        <form method="GET">
+            <span>Data: entre </span>
+            <input type="date" name="date_template_min">
+            <span>e</span>
+            <input type="date" name="date_template_max">
+            <button type="submit">Buscar</button>
+        </form>
+        {% for data_min, data_max in datas %}
+            {% if data_min is not None and data_min != '' and data_max is not None and data_max != ''%}
+                <span>Data de pesquisa: entre {{data_min}} e {{data_max}}</span>
+            {% else %}
+                <span>Período: {{data_min}} </span>
+            {% endif %}
+        {%endfor%}
+    </div>
+
+    <h2>Arrecadação do Estabelecimento: R${{totais.0}}</h2>
+    <table class="table container clearfix col-md-6 configdiv">
+        <thead>
+            <tr>
+                <th scope="col">Total Cliente</th>
+                <th scope="col">Total Garçom</th>
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                    <td scope="row">R${{totais.1}}</td>
+                    <td scope="row">R${{totais.2}}</td>
+                </tr>
+                <tr>
+                    <td scope="row">{{totais.3}}%</td>
+                    <td scope="row">{{totais.4}}%</td>
+                </tr>
+        </tbody>
+    </table>
+
+
+    <h3>Garçons</h3>
+    <table class="table container clearfix col-md-6 configdiv">
+        <thead>
+            <tr>
+                <th scope="col">Garçom</th>
+                <th scope="col">Total (R$)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for garcom, count_total_garcom in garcons%}
+                <tr>
+                    <td scope="row">{{garcom}}</td>
+                    <td scope="row">{{count_total_garcom}}</td>
+                </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+
+    <h3>Clientes</h3>
+    <table class="table container clearfix col-md-6 configdiv">
+        <thead>
+            <tr>
+                <th scope="col">Cliente</th>
+                <th scope="col">Total (R$)</th>
+                <th scope="col">Última visita</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for cliente, count_total_cliente, data_ultima_visita in clientes%}
+                <tr>
+                    <td scope="row">{{cliente}}</td>
+                    <td scope="row">{{count_total_cliente}}</td>
+                    <td scope="row">{{data_ultima_visita}}</td>
+                </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+
+{% endblock content_admin %}

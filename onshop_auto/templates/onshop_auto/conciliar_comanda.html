@@ -1,0 +1,157 @@
+{% extends "onshop_auto/mesas.html" %}
+
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li><a href="{% url 'onshop_core:administrativo' %}">Painel Administrativo</a></li>
+  <li><a class="active">Conciliar Comanda</a></li>
+  <li><a href="sign-in.html">Sair</a></li>
+</ol>
+{% endblock breadcrumb %}
+
+
+
+      {% block content_admin %}
+          <h1>Conciliar Comanda Garçom Digital</h1>
+          <p class="margin-bottom-15">Concilie os pagamentos realizados.</p>
+          
+          <div class="row">
+            <div class="col-md-12">
+              <div class="btn-group pull-right" id="templatemo_sort_btn">
+                <button type="button" class="btn btn-default">Ordenar por</button>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                  <span class="caret"></span>
+                  <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#">Categoria</a></li>
+                  <li><a href="#">Preço</a></li>
+                </ul>
+              </div>
+              <div class="table-responsive">
+                <h4 class="margin-bottom-15">Mesa {{ mesa.numero_mesa }} - Comanda {{ comanda.id }}</h4>
+                <table class="table table-striped table-hover table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Forma de Pagamento</th>
+                      <th>Valor</th>
+                      <th>Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for conciliacao in conciliacoes %}
+                    <tr class="{% cycle '' 'success' %}">
+                      <td>{{ conciliacao.forma }}</td>
+                      <td>R$ {{ conciliacao.valor_pago }}</td>                     
+                      <td><a href="{% url 'onshop_auto:deletar_conciliacao' conciliacao.id %}"><button type="submit" class="btn btn-danger">Deletar</button></a>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                      <td></td>
+                      <td><b>R$ {{ total_conciliado|floatformat:2 }}</b></td>
+                      <td><b>Total</b></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              {% block 'area_form' %}
+              <div class="row templatemo-form-buttons espaco_footer">
+                <div class="col-md-6">
+                  <a href="{% url 'onshop_auto:adicionar_conciliacao' comanda.id %}"><button type="submit" class="btn btn-primary">Adicionar Pagamento</button></a>
+                </div>
+                <div class="col-md-6">
+                  {% if total_conciliado >= total %}
+                  <a href="{% url 'onshop_auto:comanda_conciliada' comanda.id %}"><button type="submit" class="btn btn-success">
+                  {% if comanda.conciliada %}
+                  Comanda Conciliada
+                  {%else %}
+                  Conciliar Comanda
+                  {% endif %}
+                  </button></a>
+                  {% endif %}
+                </div>
+              </div>
+              {% endblock 'area_form' %}
+              <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Descrição</th>
+                      <th>Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="{% cycle '' 'success' %}">
+                      <td>Produtos</td>
+                      <td>R$ {{ total }}</td>
+                    </tr>
+                    <tr class="success">
+                      <td>Serviços</td>
+                      <td>R$ {{ servicos|floatformat:2 }}</td>
+                    </tr>
+                    <tr class="">
+                      <td>Total com Serviços</td>
+                      <td>R$ {{ total_servicos|floatformat:2 }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Produto</th>
+                      <th>Quantidade</th>
+                      <th>Observações</th>
+                      <th>Cliente</th>
+                      <th>Hora</th>
+                      {% comment %}<th>Status</th>{% endcomment %}
+                      <th>Preço</th>
+                      <th>Item</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for pedido in itens %}
+                    <tr class="{% cycle '' 'success' %}">
+                      <td>{{ pedido.produto }}</td>
+                      <td>{{ pedido.quantidade }}</td>
+                      <td>{{ pedido.complemento|safe }}</td>
+                      <td>{{ pedido.comprador.telefone }}</td>
+                      <td>{{ pedido.hora_criacao|date:'H:i - d/m' }}</td>
+                      {% comment %}<td>
+                        {% for choice in pedido.pedido_atrelado.STATUS_PEDIDO %}
+                          {% ifequal pedido.pedido_atrelado.status choice.0 %}
+                            {{ choice.1 }}
+                          {% endifequal %}
+                        {% endfor %}
+                      </td>{% endcomment %}
+                      <td>R$ {{ pedido.total }}</td>
+                      <td><a href="#"><button type="submit" class="btn btn-danger">Remover</button></a></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <div class="row templatemo-form-buttons espaco_footer">
+                <div class="col-md-12">
+                  <a href="{% url 'onshop_auto:ver_ultimas_mesas_fechadas' %}"><button type="submit" class="btn btn-primary">Voltar</button></a>
+                </div>
+              </div>
+          </div>
+          
+        </div>
+{% endblock content_admin %}
+
+
+{% block js_footer %}
+<script>
+  $(document).ready(function(){
+    $('.btn_reload').click(function(index){
+      window.location.href="{% url 'onshop_auto:ver_ultimas_mesas_fechadas' %}";
+    });
+  });
+</script>
+  {% endblock js_footer %}
+  

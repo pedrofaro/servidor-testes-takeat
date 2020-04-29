@@ -1,0 +1,88 @@
+{% extends "onshop_auto/mesas.html" %}
+
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li><a href="{% url 'onshop_core:administrativo' %}">Painel Administrativo</a></li>
+  <li><a class="active">Ver Mesas Abertas</a></li>
+  <li><a href="javascript:;" data-toggle="modal" data-target="#confirmModal">Sair</a></li>
+</ol>
+{% endblock breadcrumb %}
+
+
+
+      {% block content_admin %}
+          <h1>Últimas Mesas Fechadas Autoatendimento</h1>
+          <p class="margin-bottom-15">Veja o consumo das Mesas fechadas recentemente.</p>
+          
+          {% block 'area_form' %}
+          <div class="row">
+            <div class="col-md-12">
+              <div class="btn-group pull-right" id="templatemo_sort_btn">
+                <button type="button" class="btn btn-default">Ordenar por</button>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                  <span class="caret"></span>
+                  <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#">Categoria</a></li>
+                  <li><a href="#">Preço</a></li>
+                </ul>
+              </div>
+              <div class="table-responsive">
+                <h4 class="margin-bottom-15">Últimas Mesas Fechadas</h4>
+                <table class="table table-striped table-hover table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Mesa</th>
+                      <th>Comanda</th>
+                      <th>Total</th>
+                      <th>Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for comanda in comandas %}
+                    <tr class="{% cycle '' 'success' %}">
+                      <td>{{ comanda.mesa.numero_mesa }}</td>
+                      <td>{{ comanda.id }}</td>
+                      <!-- <td>{{ pergunta.get_respostas }}</td>-->
+                      <td>R$ {{ comanda.total }}</td>
+                      
+                      <td><a target="blank" href="{% url 'onshop_auto:imprimir_cupom' comanda.id %}" class="btn btn-success">Imprimir Cupom</a>
+                      {% if comanda.conciliada %}
+                      <a href="{% url 'onshop_auto:conciliar_comanda' comanda.id %}" class="btn btn-success">Conciliado</a>
+                      {% else %}
+                      <a href="{% url 'onshop_auto:conciliar_comanda' comanda.id %}" class="btn btn-danger">Conciliar</a>
+                      {% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                {% if comandas.has_other_pages %}
+                <ul class= "pagination">
+                  {% if comandas.has_previous %}
+                  <li><a href="?page={{ comandas.previous_page_number }}">&laquo;</a></li>
+                  {% else %}
+                  <li class="disabled"><span>&laquo;</span></li>
+                  {% endif %}
+                  {% for i in comandas.paginator.page_range %}
+                    {% if comandas.number == i %}
+                      <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                    {% else %}
+                      <li><a href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                  {% endfor %}
+                  {% if comandas.has_next %}
+                  <li><a href="?page={{ comandas.next_page_number }}">&raquo;</a></li>
+                  {% else %}
+                  <li class="disabled"><span>&raquo;</span></li>
+                  {% endif %}
+                </ul>
+                {% endif %}
+              </div>
+          </div>
+          {% endblock 'area_form' %}
+        </div>
+{% endblock content_admin %}
+  
