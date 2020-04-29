@@ -128,5 +128,8 @@ urlpatterns = [
     url(r'^relatorios/$', views.ver_relatorios, name='ver_relatorios'), 
     url(r'^relatorio-por-produto/$', views.relatorio_por_produto, name='relatorio_por_produto'), #Relatórios por Produtos - Pedro 17/03/2020
     url(r'^relatorio-de-clientes/$', views.relatorio_de_clientes, name='relatorio_de_clientes'), #Relatórios de Clientes - Pedro 24/03/2020
+
+#Dashboard em teste
+    url(r'^dashboard/', views.dashboard, name='dashboard'),
 ]
 

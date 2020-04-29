@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Em Teste</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'onshop_auto/css/dashboard.css'%}"/>
+    <script async="" src="//www.google-analytics.com/analytics.js"></script>
+    <script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/390a87d1f3.js" crossorigin="anonymous"></script>
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-1.11.2.js"></script>
+    <script type="text/javascript"> jQuery(window).load(function($){ atualizaRelogio(); }); </script>
+</head>
+<body style="background: #edebeb;">
+
+    <section id="menuLateral">
+        <img src="https://i.imgur.com/xxUdkSp.png" width="180px" height="70px;">
+        <nav>
+            <a href="#" class="active"><i class="fas fa-home"></i>Painel Principal</a>
+            <a href="#"><i class="fas fa-users"></i>Relatório de Clientes</a>
+            <a href="#"><i class="fas fa-utensils"></i>Relatório de Produtos</a>
+            <a href="#"><i class="fas fa-star-half-alt"></i>Avaliações</a>
+            <a href="#">Voltar</a>
+        </nav>
+    </section>
+
+    <header>
+
+        <div class="hora-area mb-3">
+          <h7>Bem vindo! <output id="datadia"></output>, <output id="data"></output>, <output id="hora"></output></h7>
+        </div>
+
+        <div class="user-area">
+            <a href="#"><i class="fas fa-cog"></i></a>
+            <a href="#"><i class="fas fa-bell" class="notification"></i><span class="circle">3</span></a>
+            <a href="#"><span>Chef's Burger</span></a>
+        </div>
+    </header>
+
+    <h5 class="titulo">Dashboard</h5>
+
+    <div id="periodo" class="dropdown">
+      <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Hoje
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="#">Hoje</a>
+        <a class="dropdown-item" href="#">Últimos 7 dias</a>
+        <a class="dropdown-item" href="#">Últimos 30 dias</a>
+      </div>
+    </div>
+    
+
+    <!-- Card de clientes -->
+    <div id="cardClientes">
+        <h6>Clientes</h6>
+        <h3><b>430</b></h3>
+        <div class="card"><i class="fas fa-user-friends"></i></div>
+        <span><i class="fas fa-arrow-up"></i> 6,87%</span>
+        <h5 class="legenda">em relação ao mês passado</h5>
+    </div>
+
+
+    <!-- Card de pedidos -->
+    <div id="cardPedidos">
+       <h6>Pedidos</h6>
+        <h3><b>854</b></h3>
+        <div class="card"><i class="fas fa-pencil-alt"></i></div>
+        <span><i class="fas fa-arrow-up"></i> 4,32%</span>
+        <h5 class="legenda">em relação ao mês passado</h5>
+    </div>
+
+    <!-- Card de arrecadação -->
+    <div id="cardClientes" style="margin-top: 20px;">
+        <h6>Arrecadação</h6>
+        <h3><b>2.492,32</b><span style="color: black; padding-left:0px;">R$</span></h3>
+        <div class="card"><i class="fas fa-dollar-sign"></i></div>
+        <span><i class="fas fa-arrow-up"></i> 23,07%</span>
+        <h5 class="legenda">em relação ao mês passado</h5>
+    </div>
+
+    <!-- Card de avaliações -->
+    <div id="cardPedidos" style="margin-top: -140px;">
+        <h6>Avaliações</h6>
+        <h3><b>4.3</b><span style="color: black; padding-left:0px;">/5</span></h3>
+        <div class="card"><i class="fas fa-star"></i></div>
+        <span><i class="fas fa-arrow-up"></i> 10,17%</span>
+        <h5 class="legenda">em relação ao mês passado</h5>
+    </div>
+
+    <!-- gráfico -->
+    <div style="margin-left: 740px; margin-top: -300px; background: white; height: 300px; width: 500px;">
+        <h5 style="padding-top: 10px; color: grey; padding-left: 20px;">Categorias</h5>
+        <div style="height: 250px; width: 500px; margin-left: 10px;">
+            <canvas id="grafico" width="450" height="200"></canvas>
+        </div>
+    </div>
+
+  <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+
+  <script type="text/javascript">
+        var ctx = document.getElementById('grafico').getContext("2d");
+        var grafico = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [23, 45, 38, 29],
+                    backgroundColor:[
+                    window.chartColors.red,
+                    window.chartColors.blue,
+                    window.chartColors.green,
+                    window.chartColors.orange,
+                ],
+                label: 'Dataset 1'
+                }],
+                labels:['Entradas', 'Hamburgers', 'Bebidas', 'Sobremesas']
+            }
+        });
+  </script>
+
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [12, 19, 3, 5, 2, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+
+    <script>
+       function atualizaRelogio(){
+       var momentoAtual = new Date();
+
+       var vhora = momentoAtual.getHours();
+       var vminuto = momentoAtual.getMinutes();
+       var vsegundo = momentoAtual.getSeconds();
+
+       var vdia = momentoAtual.getDate();
+       var vmes = momentoAtual.getMonth() + 1;
+       var vano = momentoAtual.getFullYear();
+
+       if (vdia < 10){ vdia = "0" + vdia;}
+       if (vmes < 10){ vmes = "0" + vmes;}
+       if (vhora < 10){ vhora = "0" + vhora;}
+       if (vminuto < 10){ vminuto = "0" + vminuto;}
+       if (vsegundo < 10){ vsegundo = "0" + vsegundo;}
+
+       dataFormat = vdia + "/" + vmes + "/" + vano;
+       horaFormat = vhora + ":" + vminuto + ":" + vsegundo;
+
+       var semana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+       var d = semana[momentoAtual.getDay()];
+
+       document.getElementById("datadia").innerHTML = d;
+       document.getElementById("hora").innerHTML = horaFormat;
+       document.getElementById("data").innerHTML = dataFormat;
+
+
+
+       setTimeout("atualizaRelogio()",1000);
+
+
+       }
+    </script>
+
+</body>
+</html>

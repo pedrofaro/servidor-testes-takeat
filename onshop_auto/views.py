@@ -31,6 +31,49 @@ def tela_principal(request):
 
 	return render(request, 'onshop_auto/tela_principal.html', { 'estabelecimento': estabelecimento })
 
+# ------------ Dashboard Em Teste -----------
+# ------------ -------------------
+def dashboard(request):
+
+    #Card de Clientes
+    compradores = CompradorPedidoAuto.objects.all()
+    clientes = []
+
+    for comprador in compradores:
+        if comprador.telefone[0] == "(":
+            if comprador.telefone not in clientes:
+                clientes.append(comprador.telefone)
+
+    #Card de Pedidos
+    pedidos = ItemPedidoAuto.objects.all()
+
+    #Card de Arrecadação
+    arrecadacao_total = 0
+    for pedido in pedidos:
+        arrecadacao_total = arrecadacao_total + pedido.total
+
+    #Card de Avaliação
+    avaliacoes = Avaliacao.objects.all()
+    media_avaliacoes = 0
+
+    for avaliacao in avaliacoes:
+        av = (avaliacao.nota_primeiro_campo + avaliacao.nota_segundo_campo + avaliacao.nota_terceiro_campo + avaliacao.nota_quarto_campo)
+        media_avaliacoes = media_avaliacoes + (av/5)
+
+    #Gráfico de Categorias
+
+
+    #Dados
+    dados = {
+        'n_de_clientes': len(clientes),
+        'n_de_pedidos': len(pedidos),
+        'arrecadacao': arrecadacao_total,
+        'avaliacao': media_avaliacoes,
+    }
+
+    return render(request, 'onshop_auto/dashboard.html')
+
+
 # ------------ Relatórios -----------
 # ------------ -------------------
 def ver_relatorios(request):
