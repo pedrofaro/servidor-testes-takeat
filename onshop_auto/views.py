@@ -34,45 +34,85 @@ def tela_principal(request):
 # ------------ Dashboard Em Teste -----------
 # ------------ -------------------
 def dashboard(request):
+	#Filtro de datas
+	filtro_data = "Hoje"
 
-    #Card de Clientes
-    compradores = CompradorPedidoAuto.objects.all()
-    clientes = []
+	filtro_data_req = request.GET.get('filtro_data')
+	if filtro_data_req == "1":
+		filtro_data = "Hoje"
+		data_min = date.today()
+		data_max = date.today()
 
-    for comprador in compradores:
-        if comprador.telefone[0] == "(":
-            if comprador.telefone not in clientes:
-                clientes.append(comprador.telefone)
+	elif filtro_data_req == "2":
+		data_min = date.today() - timedelta(7)
+		data_max = date.today()
+		filtro_data = "Últimos 7 dias ("+ data_min.strftime('%d/%m/%Y')+" a "+ data_max.strftime('%d/%m/%Y')+ ")"
 
-    #Card de Pedidos
-    pedidos = ItemPedidoAuto.objects.all()
+	elif filtro_data_req == "3":
+		data_min = date.today() - timedelta(30)
+		data_max = date.today()
+		filtro_data = "Últimos 30 dias (" + data_min.strftime('%d/%m/%Y') + " a " + data_max.strftime('%d/%m/%Y') + ")"
 
-    #Card de Arrecadação
-    arrecadacao_total = 0
-    for pedido in pedidos:
-        arrecadacao_total = arrecadacao_total + pedido.total
+	elif filtro_data_req == None:
+		data_max_req = request.GET.get('date_template_max')
+		data_min_req = request.GET.get('date_template_min')
 
-    #Card de Avaliação
-    avaliacoes = Avaliacao.objects.all()
-    media_avaliacoes = 0
+		if data_max_req == None or data_min_req == None or data_max_req == '' or data_min_req == '':
+			filtro_data = "Hoje"
+			data_min = date.today()
+			data_max = date.today()
 
-    for avaliacao in avaliacoes:
-        av = (avaliacao.nota_primeiro_campo + avaliacao.nota_segundo_campo + avaliacao.nota_terceiro_campo + avaliacao.nota_quarto_campo)
-        media_avaliacoes = media_avaliacoes + (av/5)
+		elif data_max_req <> None and data_min_req <> None and data_max_req <> '' and data_min_req <> '':
+			data_min = datetime.strptime(data_min_req, '%Y-%m-%d').date()
+			data_max = datetime.strptime(data_max_req, '%Y-%m-%d').date()
+			filtro_data = "Período de " + data_min.strftime('%d/%m/%Y') + " a " + data_max.strftime('%d/%m/%Y')
 
-    #Gráfico de Categorias
+    #Pegando os pedidos
+	pedidos = ItemPedidoAuto.objects.all()
+	#pedidos = pedidos.filter(hora_criacao__date__range=[data_min, data_max])
+
+	#Calculando o Card de Arrecadação, Pedidos e Clientes
+	clientes = []
+	arrecadacao_total = 0
+	total_pedidos = 0
+	for pedido in pedidos:
+		arrecadacao_total = arrecadacao_total + pedido.total
+		total_pedidos = total_pedidos + pedido.quantidade
+
+		#Contar os clientes
+		if pedido.comprador.telefone[0] == "(":
+			if pedido.comprador.telefone not in clientes:
+				clientes.append(pedido.comprador.telefone)
 
 
-    #Dados
-    dados = {
+	#Card de Avaliação
+	avaliacoes = Avaliacao.objects.all()
+	#avaliacoes = avaliacoes.filter(hora_criacao__date__range=[data_min, data_max])
+	media_avaliacoes = 0
+	print(avaliacoes[0].nota_primeiro_campo)
+
+	for avaliacao in avaliacoes:
+		av = (avaliacao.nota_primeiro_campo + avaliacao.nota_segundo_campo + avaliacao.nota_terceiro_campo + avaliacao.nota_quarto_campo)
+		if media_avaliacoes == 0:
+			media_avaliacoes = media_avaliacoes + (av/4)
+		else:
+			media_avaliacoes = (media_avaliacoes + (av/4))/2
+
+	media_avaliacoes = "%.2f" % (media_avaliacoes)
+
+	#Gráfico de Categorias
+
+
+	#Dados
+	dados = {
         'n_de_clientes': len(clientes),
-        'n_de_pedidos': len(pedidos),
+        'n_de_pedidos': total_pedidos,
         'arrecadacao': arrecadacao_total,
         'avaliacao': media_avaliacoes,
+		'filtro_data': filtro_data
     }
 
-    return render(request, 'onshop_auto/dashboard.html')
-
+	return render(request, 'onshop_auto/dashboard.html', dados)
 
 # ------------ Relatórios -----------
 # ------------ -------------------
@@ -252,7 +292,7 @@ def relatorio_de_clientes(request):
 	count_total_valor_cliente = 0
 
 	for cliente in clientes:
-		count_total_cliente = 0 #total $ consumido
+		count_total_cliente = 0  # total $ consumido
 
 		data_ultima_visita = datetime(2020, 1, 1, 0, 0, 0)
 		data_ultima_visita = data_ultima_visita.replace(tzinfo=pytz.UTC)
@@ -263,7 +303,7 @@ def relatorio_de_clientes(request):
 				if data_ultima_visita < pedido.hora_criacao:
 					data_ultima_visita = pedido.hora_criacao
 
-		if count_total_cliente !=0:
+		if count_total_cliente != 0:
 			cliente_total.append([cliente, count_total_cliente, data_ultima_visita.strftime('%d/%m/%Y')])
 			count_total_valor_cliente = count_total_valor_cliente + count_total_cliente
 
@@ -274,9 +314,10 @@ def relatorio_de_clientes(request):
 	porcent_garcom = "%.2f" % (porcent_garcom)
 	porcent_cliente = "%.2f" % (porcent_cliente)
 
-	valor_total = [count_total_estabelecimento, count_total_valor_cliente, count_total_valor_garcom, porcent_cliente, porcent_garcom]
+	valor_total = [count_total_estabelecimento, count_total_valor_cliente, count_total_valor_garcom, porcent_cliente,
+				   porcent_garcom]
 	print(valor_total)
-	return render(request, 'onshop_auto/relatorio_de_clientes.html', {'datas': data_filtro, 'clientes': cliente_total, 'garcons':garcom_total, 'totais': valor_total})
+	return render(request, 'onshop_auto/relatorio_de_clientes_dash.html', {'datas': data_filtro, 'clientes': cliente_total, 'garcons':garcom_total, 'totais': valor_total})
 
 
 # ------------ Produtos -----------

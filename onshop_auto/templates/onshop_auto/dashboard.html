@@ -44,12 +44,39 @@
 
     <div id="periodo" class="dropdown">
       <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Hoje
+        {{filtro_data}}
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" href="#">Hoje</a>
-        <a class="dropdown-item" href="#">Últimos 7 dias</a>
-        <a class="dropdown-item" href="#">Últimos 30 dias</a>
+        <a class="dropdown-item" href="?filtro_data=1">Hoje</a>
+        <a class="dropdown-item" href="?filtro_data=2">Últimos 7 dias</a>
+        <a class="dropdown-item" href="?filtro_data=3">Últimos 30 dias</a>
+        <a class="dropdown-item" href="?filtro_data=4" data-toggle="modal" data-target="#selecionarperiodo">Selecionar período</a>
+      </div>
+    </div>
+
+    <!-- Modal para selecionar a data -->
+    <div class="modal fade" id="selecionarperiodo" tabindex="-1" role="dialog" aria-labelledby="selecionarperiodoLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Selecionar período</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form method="GET">
+                <span>Entre </span>
+                <input type="date" name="date_template_min">
+                <span>e</span>
+                <input type="date" name="date_template_max">
+                <div class="modal-footer" style="margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -57,7 +84,7 @@
     <!-- Card de clientes -->
     <div id="cardClientes">
         <h6>Clientes</h6>
-        <h3><b>430</b></h3>
+        <h3><b>{{n_de_clientes}}</b></h3>
         <div class="card"><i class="fas fa-user-friends"></i></div>
         <span><i class="fas fa-arrow-up"></i> 6,87%</span>
         <h5 class="legenda">em relação ao mês passado</h5>
@@ -67,7 +94,7 @@
     <!-- Card de pedidos -->
     <div id="cardPedidos">
        <h6>Pedidos</h6>
-        <h3><b>854</b></h3>
+        <h3><b>{{n_de_pedidos}}</b></h3>
         <div class="card"><i class="fas fa-pencil-alt"></i></div>
         <span><i class="fas fa-arrow-up"></i> 4,32%</span>
         <h5 class="legenda">em relação ao mês passado</h5>
@@ -76,7 +103,7 @@
     <!-- Card de arrecadação -->
     <div id="cardClientes" style="margin-top: 20px;">
         <h6>Arrecadação</h6>
-        <h3><b>2.492,32</b><span style="color: black; padding-left:0px;">R$</span></h3>
+        <h3><span style="color: black; padding-left:0px;">R$</span><b>{{arrecadacao}}</b></h3>
         <div class="card"><i class="fas fa-dollar-sign"></i></div>
         <span><i class="fas fa-arrow-up"></i> 23,07%</span>
         <h5 class="legenda">em relação ao mês passado</h5>
@@ -85,7 +112,7 @@
     <!-- Card de avaliações -->
     <div id="cardPedidos" style="margin-top: -140px;">
         <h6>Avaliações</h6>
-        <h3><b>4.3</b><span style="color: black; padding-left:0px;">/5</span></h3>
+        <h3><b>{{avaliacao}}</b><span style="color: black; padding-left:0px;">/5</span></h3>
         <div class="card"><i class="fas fa-star"></i></div>
         <span><i class="fas fa-arrow-up"></i> 10,17%</span>
         <h5 class="legenda">em relação ao mês passado</h5>
@@ -196,6 +223,8 @@
 
        }
     </script>
-
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 </body>
 </html>

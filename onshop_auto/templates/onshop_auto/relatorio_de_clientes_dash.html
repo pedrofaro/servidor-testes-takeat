@@ -1,0 +1,109 @@
+{% extends "onshop_auto/dashboard.html" %}
+
+
+{% block menu_admin %}
+      <section id="menuLateral">
+            <img src="https://i.imgur.com/xxUdkSp.png" width="180px" height="70px;">
+            <nav>
+                <a href="#" class="active"><i class="fas fa-home"></i>Painel Principal</a>
+                <a href="#"><i class="fas fa-users"></i>Relatório de Clientes</a>
+                <a href="#"><i class="fas fa-utensils"></i>Relatório de Produtos</a>
+                <a href="#"><i class="fas fa-star-half-alt"></i>Avaliações</a>
+                <a href="#">Voltar</a>
+            </nav>
+        </section>
+
+        <header>
+
+            <div class="hora-area mb-3">
+              <h7>Bem vindo! <output id="datadia"></output>, <output id="data"></output>, <output id="hora"></output></h7>
+            </div>
+
+            <div class="user-area">
+                <a href="#"><i class="fas fa-cog"></i></a>
+                <a href="#"><i class="fas fa-bell" class="notification"></i><span class="circle">3</span></a>
+                <a href="#"><span>Chef's Burger</span></a>
+            </div>
+        </header>
+      {% endblock menu_admin %}
+
+{% block content_admin %}
+<h2 xmlns:b="http://www.w3.org/1999/html">Relatório de Clientes</h2>
+
+    <div class="col-3">
+        <form method="GET">
+            <span>Data: entre </span>
+            <input type="date" name="date_template_min">
+            <span>e</span>
+            <input type="date" name="date_template_max">
+            <button type="submit">Buscar</button>
+        </form>
+        {% for data_min, data_max in datas %}
+            {% if data_min is not None and data_min != '' and data_max is not None and data_max != ''%}
+                <span>Data de pesquisa: entre {{data_min}} e {{data_max}}</span>
+            {% else %}
+                <span>Período: {{data_min}} </span>
+            {% endif %}
+        {%endfor%}
+    </div>
+
+    <h2>Arrecadação do Estabelecimento: R${{totais.0}}</h2>
+    <table class="table container clearfix col-md-6 configdiv">
+        <thead>
+            <tr>
+                <th scope="col">Total Cliente</th>
+                <th scope="col">Total Garçom</th>
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                    <td scope="row">R${{totais.1}}</td>
+                    <td scope="row">R${{totais.2}}</td>
+                </tr>
+                <tr>
+                    <td scope="row">{{totais.3}}%</td>
+                    <td scope="row">{{totais.4}}%</td>
+                </tr>
+        </tbody>
+    </table>
+
+
+    <h3>Garçons</h3>
+    <table class="table container clearfix col-md-6 configdiv">
+        <thead>
+            <tr>
+                <th scope="col">Garçom</th>
+                <th scope="col">Total (R$)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for garcom, count_total_garcom in garcons%}
+                <tr>
+                    <td scope="row">{{garcom}}</td>
+                    <td scope="row">{{count_total_garcom}}</td>
+                </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+
+    <h3>Clientes</h3>
+    <table class="table container clearfix col-md-6 configdiv">
+        <thead>
+            <tr>
+                <th scope="col">Cliente</th>
+                <th scope="col">Total (R$)</th>
+                <th scope="col">Última visita</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for cliente, count_total_cliente, data_ultima_visita in clientes%}
+                <tr>
+                    <td scope="row">{{cliente}}</td>
+                    <td scope="row">{{count_total_cliente}}</td>
+                    <td scope="row">{{data_ultima_visita}}</td>
+                </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+
+{% endblock content_admin %}
