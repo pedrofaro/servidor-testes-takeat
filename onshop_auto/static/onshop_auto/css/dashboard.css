@@ -21,12 +21,21 @@ body{
     margin-top: -40px;
 }
 
+
+#periodo-rel-prod{
+    position: absolute;
+    margin-left: 250px;
+    margin-top: -40px;
+}
+
 #menuLateral{
     background: #302D43;
     width: 260px;
+    height: 100%;
     position: absolute;
     top: 0;
     bottom: 0;
+    height: 2300px;
 }
 
 #menuLateral nav{
@@ -279,10 +288,16 @@ header .search-area .lupa{
 }
 
 .titulo{
-    margin-left: 300px;
+    margin-left: 40px;
     margin-top: 40px;
 }
 
 .a-card a div:hover{
     text-decoration: none;
+}
+
+.accordion {
+    margin-left: 30px;
+    margin-top: 30px;
+    width: 90%;
 }

@@ -1,119 +1,357 @@
-{% extends "onshop_auto/ver_relatorios.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Em Teste</title>
+    <link rel="stylesheet" type="text/css" href="{% static "onshop_auto/css/dashboard.css"%}"/>
+    <script async="" src="//www.google-analytics.com/analytics.js"></script>
+    <script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/390a87d1f3.js" crossorigin="anonymous"></script>
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-1.11.2.js"></script>
+    <script type="text/javascript"> jQuery(window).load(function($){ atualizaRelogio(); }); </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+</head>
+<body style="background: #edebeb;">
 
-{% block content_admin %}
-<h2 xmlns:b="http://www.w3.org/1999/html">Relatório por Produto</h2>
+    <section id="menuLateral">
+        <img src="https://i.imgur.com/xxUdkSp.png" width="180px" height="70px;">
+        <nav>
+            <a href="../dashboard"><i class="fas fa-home"></i>Painel Principal</a>
+            <a href="#"><i class="fas fa-users"></i>Relatório de Clientes</a>
+            <a href="#" class="active"><i class="fas fa-utensils"></i>Relatório de Produtos</a>
+            <a href="#"><i class="fas fa-star-half-alt"></i>Avaliações</a>
+            <a href="#">Voltar</a>
+        </nav>
+    </section>
 
-    <div class="col-3">
-        <form method="GET">
-            <span>Data: entre </span>
-            <input type="date" name="date_template_min">
-            <span>e</span>
-            <input type="date" name="date_template_max">
-            <button type="submit">Buscar</button>
-        </form>
-        {% for data_min, data_max in dataa %}
-            {% if data_min is not None and data_min != '' and data_max is not None and data_max != ''%}
-                <span>Data de pesquisa: entre {{data_min}} e {{data_max}}</span>
-            {% else %}
-                <span>Data de pesquisa: {{data_min}} </span>
-            {% endif %}
-        {%endfor%}
+    <header>
+
+        <div class="hora-area mb-3">
+          <h7>Bem vindo! <output id="datadia"></output>, <output id="data"></output>, <output id="hora"></output></h7>
+        </div>
+
+        <div class="user-area">
+            <a href="#"><i class="fas fa-cog"></i></a>
+            <a href="#"><i class="fas fa-bell" class="notification"></i><span class="circle">3</span></a>
+            <a href="#"><span>Chef's Burger</span></a>
+        </div>
+    </header>
+
+    <div style="margin-left: 260px;">
+
+    <h5 class="titulo">Relatório por Produto</h5>
+
+    <div id="periodo-rel-prod" class="dropdown" >
+      <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="far fa-calendar" style="padding-right: 5px;"></i> {{filtro_data}}
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="?filtro_data=1">Hoje</a>
+        <a class="dropdown-item" href="?filtro_data=2">Últimos 7 dias</a>
+        <a class="dropdown-item" href="?filtro_data=3">Últimos 30 dias</a>
+        <a class="dropdown-item" href="?filtro_data=4" data-toggle="modal" data-target="#selecionarperiodo">Selecionar período</a>
+      </div>
+    </div>
+
+    <!-- Modal para selecionar a data -->
+    <div class="modal fade" id="selecionarperiodo" tabindex="-1" role="dialog" aria-labelledby="selecionarperiodoLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Selecionar período</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form method="GET">
+                <span>Entre </span>
+                <input type="date" name="date_template_min">
+                <span>e</span>
+                <input type="date" name="date_template_max">
+                <div class="modal-footer" style="margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card de arrecadação -->
+    <div id="cardClientes" style="margin-top: 20px; margin-left: 40px;">
+        <h6>Arrecadação</h6>
+        <h3><span style="color: black; padding-left:0px;">R$</span><b>{{total_preco_produto_com_complemento}}</b></h3>
+        <div class="card"><i class="fas fa-dollar-sign"></i></div>
+        <span><i class="fas fa-arrow-up"></i> 23,07%</span>
+        <h5 class="legenda">em relação ao mês passado</h5>
+    </div>
+
+    <!-- Card de arrecadação sem complementos-->
+    <div id="cardPedidos" style="margin-top: -140px; margin-left: 250px; height: 60px; border-left: 10px solid green;">
+        <h6>Sem complementos</h6>
+        <h3 style="padding-top:0px; margin-top: -10px; text-align: center;"><span style="color: black; padding-left:0px;">R$</span><b>{{total_preco_produto}}</b></h3>
+    </div>
+
+    <!-- Card de arrecadação com complementos-->
+    <div id="cardPedidos" style="margin-top: -60px; margin-left: 250px; height: 60px; border-left: 10px solid yellow;">
+        <h6>Complementos</h6>
+        <h3 style="padding-top:0px; margin-top: -10px; text-align: center;"><span style="color: black; padding-left:0px;">R$</span><b>{{total_preco_complemento}}</b></h3>
+    </div>
+
+    <!-- Card de pedidos -->
+    <div id="cardPedidos" style="margin-left: 40px; margin-top: 30px;">
+       <h6>Pedidos</h6>
+        <h3><b>{{total_produto_com_complemento}}</b></h3>
+        <div class="card"><i class="fas fa-pencil-alt"></i></div>
+        <span><i class="fas fa-arrow-up"></i> 4,32%</span>
+        <h5 class="legenda">em relação ao mês passado</h5>
+    </div>
+
+    <!-- Card de pedidos sem complementos-->
+    <div id="cardPedidos" style="margin-top: 30px; margin-left: 250px; height: 60px; border-left: 10px solid green;">
+        <h6>Com complementos</h6>
+        <h3 style="padding-top:0px; margin-top: -10px; text-align: center;"><b>8</b></h3>
+    </div>
+
+    <!-- Card de pedidos com complementos-->
+    <div id="cardPedidos" style="margin-top: 110px; margin-left: 250px; height: 60px; border-left: 10px solid yellow;">
+        <h6>Sem Complementos</h6>
+        <h3 style="padding-top:0px; margin-top: -10px; text-align: center;"><b>1</b></h3>
+    </div>
+
+    <!-- gráfico -->
+    <div style="margin-left: 480px; margin-top: -140px; background: white; height: 300px; width: 450px;">
+        <h5 style="padding-top: 10px; color: grey; padding-left: 20px;">Categorias</h5>
+        <div style="height: 200px; width: 450px; margin-left: 10px;">
+            <canvas id="grafico" width="450" height="200"></canvas>
+        </div>
     </div>
 
     {%for categoria, count_categoria, count_categoria_preco, porcentagem_categoria, porcentagem_categoria_preco in categorias%}
-        <h3>{{categoria.nome}}</h3>
-        <table class="table container clearfix col-md-6 configdiv">
-            <thead>
-                <tr>
-                    <th scope="col">Produto</th>
-                    <th scope="col">Quantidade</th>
-                    <th scope="col">Total (R$)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for produto, count, count_preco in lista %}
-                    {% if produto.categoria == categoria %}
-                    <tr>
-                        <td scope="row">{{produto.nome}}</td>
-                        <td scope="row">{{count}}</td>
-                        <td scope="row">{{count_preco}}</td>
-                    </tr>
-                    {%endif%}
-                {%endfor%}
-            </tbody>
-            <tbody>
-                 <tr>
-                     <td scope="row"><b>Total</b></td>
-                     <td scope="row"><b>{{count_categoria}}</b></td>
-                     <td scope="row"><b>{{count_categoria_preco}}</b></td>
-                 </tr>
-                <tr>
-                     <td scope="row"><b>Total (%)</b></td>
-                     <td scope="row"><b>{{porcentagem_categoria}}%</b></td>
-                     <td scope="row"><b>{{porcentagem_categoria_preco}}%</b></td>
-                 </tr>
-            </tbody>
-        </table>
+        <div class="accordion" id="accordion{{categoria.nome}}">
+          <div class="card">
+            <div class="card-header bg-danger text-white" id="heading{{categoria.nome}}"  data-toggle="collapse" data-target="#collapse{{categoria.nome}}" aria-expanded="true" aria-controls="collapse{{categoria.nome}}">
+              <h2 class="mb-0">
+                <h5 style="margin-top: 5px;">
+                    <i class="fas fa-align-left" style="padding-right: 10px;"></i>
+                    {{categoria.nome}}
+                </h5>
+                    <i class="fas fa-angle-down" style="position: absolute; margin-left: 92%; margin-top: -25px;"></i>
+              </h2>
+            </div>
+
+            <div id="collapse{{categoria.nome}}" class="collapse show" aria-labelledby="heading{{categoria.nome}}" data-parent="#accordion{{categoria.nome}}">
+              <div class="card-body">
+                <table class="table container clearfix configdiv">
+                    <thead>
+                        <tr>
+                            <th scope="col">Produto</th>
+                            <th scope="col">Quantidade</th>
+                            <th scope="col">Total (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for produto, count, count_preco in lista %}
+                        {% if produto.categoria == categoria %}
+                        <tr>
+                            <td scope="row">{{produto.nome}}</td>
+                            <td scope="row">{{count}}</td>
+                            <td scope="row">{{count_preco}}</td>
+                        </tr>
+                        {%endif%}
+                    {%endfor%}
+                    </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card-footer bg-dark text-white" style="">
+              <h5 class="mb-0">
+                  <table class="table text-white">
+                    <tbody>
+                     <tr>
+                         <td scope="row"><b>Total</b></td>
+                         <td scope="row"><b>Quantidade: {{count_categoria}}</b></td>
+                         <td scope="row"><b>R${{count_categoria_preco}}</b></td>
+                     </tr>
+                     <tr>
+                         <td scope="row"><b>Total (%)</b></td>
+                         <td scope="row"><b>{{porcentagem_categoria}}%</b></td>
+                         <td scope="row"><b>{{porcentagem_categoria_preco}}%</b></td>
+                     </tr>
+                    </tbody>
+                  </table>
+              </h5>
+            </div>
+          </div>
+        </div>
     {%endfor%}
 
-    <h3>Complementos</h3>
-        <table class="table container clearfix col-md-6 configdiv">
-            <thead>
-                <tr>
-                    <th scope="col">Complemento</th>
-                    <th scope="col">Quantidade</th>
-                    <th scope="col">Total (R$)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for complemento, count_complemento, count_preco_complemento in complementos %}
+    <div class="accordion" id="accordionExample">
+      <div class="card">
+        <div class="card-header bg-warning text-black" id="headingOne"  data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          <h2 class="mb-0">
+            <h5 style="margin-top: 5px;">
+                <i class="fas fa-align-left" style="padding-right: 10px;"></i>
+                Complementos
+            </h5>
+                <i class="fas fa-angle-down" style="position: absolute; margin-left: 92%; margin-top: -25px;"></i>
+          </h2>
+        </div>
+
+        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+          <div class="card-body">
+            <table class="table container clearfix configdiv">
+                <thead>
                     <tr>
-                        <td scope="row">{{complemento}}</td>
-                        <td scope="row">{{count_complemento}}</td>
-                        <td scope="row">{{count_preco_complemento}}</td>
+                        <th scope="col">Complemento</th>
+                        <th scope="col">Quantidade</th>
+                        <th scope="col">Total (R$)</th>
                     </tr>
-                {%endfor%}
-            </tbody>
-            <tbody>
+                </thead>
+                <tbody>
+                    {% for complemento, count_complemento, count_preco_complemento in complementos %}
+                        <tr>
+                            <td scope="row">{{complemento}}</td>
+                            <td scope="row">{{count_complemento}}</td>
+                            <td scope="row">{{count_preco_complemento}}</td>
+                        </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card-footer bg-dark" style="">
+          <h5 class="mb-0">
+              <table class="table text-white">
+                <tbody>
                  <tr>
                      <td scope="row"><b>Total</b></td>
-                     <td scope="row"><b>{{total_complemento}}</b></td>
-                     <td scope="row"><b>{{total_preco_complemento}}</b></td>
+                     <td scope="row"><b>Quantidade: {{total_complemento}}</b></td>
+                     <td scope="row"><b>R${{total_preco_complemento}}</b></td>
                  </tr>
-                <tr>
+                 <tr>
                      <td scope="row"><b>Total (%)</b></td>
                      <td scope="row"><b>{{porcentagem_complemento}}%</b></td>
                      <td scope="row"><b>{{porcentagem_complemento_preco}}%</b></td>
                  </tr>
-            </tbody>
-        </table>
+                </tbody>
+              </table>
+          </h5>
+        </div>
+      </div>
+    </div>
+
+    <footer style="height: 100px;">
+
+    </footer>
+    </div>
+<script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+
+  <script type="text/javascript">
+        var ctx = document.getElementById('grafico').getContext("2d");
+        var grafico = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: {{grafico_valores|safe}},
+                    backgroundColor:[
+                    window.chartColors.red,
+                    window.chartColors.blue,
+                    window.chartColors.green,
+                    window.chartColors.orange,
+                ],
+                label: 'Dataset 1'
+                }],
+                labels:{{grafico_categorias|safe}}
+            }
+        });
+  </script>
+
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [12, 19, 3, 5, 2, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+
+    <script>
+       function atualizaRelogio(){
+       var momentoAtual = new Date();
+
+       var vhora = momentoAtual.getHours();
+       var vminuto = momentoAtual.getMinutes();
+       var vsegundo = momentoAtual.getSeconds();
+
+       var vdia = momentoAtual.getDate();
+       var vmes = momentoAtual.getMonth() + 1;
+       var vano = momentoAtual.getFullYear();
+
+       if (vdia < 10){ vdia = "0" + vdia;}
+       if (vmes < 10){ vmes = "0" + vmes;}
+       if (vhora < 10){ vhora = "0" + vhora;}
+       if (vminuto < 10){ vminuto = "0" + vminuto;}
+       if (vsegundo < 10){ vsegundo = "0" + vsegundo;}
+
+       dataFormat = vdia + "/" + vmes + "/" + vano;
+       horaFormat = vhora + ":" + vminuto + ":" + vsegundo;
+
+       var semana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+       var d = semana[momentoAtual.getDay()];
+
+       document.getElementById("datadia").innerHTML = d;
+       document.getElementById("hora").innerHTML = horaFormat;
+       document.getElementById("data").innerHTML = dataFormat;
 
 
-    <h3>Total</h3>
-        <table class="table container clearfix col-md-6 configdiv">
-            <thead>
-                <tr>
-                    <th scope="col"> </th>
-                    <th scope="col">Quantidade</th>
-                    <th scope="col">Total (R$)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                     <td scope="row"><b>Total (s/ compl.)</b></td>
-                     <td scope="row"><b>{{total_produto}}</b></td>
-                     <td scope="row"><b>{{total_preco_produto}}</b></td>
-                 </tr>
-                <tr>
-                     <td scope="row"><b>Total (c/ compl.)</b></td>
-                     <td scope="row"><b>{{total_produto_com_complemento}}</b></td>
-                     <td scope="row"><b>{{total_preco_produto_com_complemento}}</b></td>
-                 </tr>
-                <tr>
-                     <td scope="row"><b>Total (%)</b></td>
-                     <td scope="row"><b>100%</b></td>
-                     <td scope="row"><b>100%</b></td>
-                 </tr>
-            </tbody>
-        </table>
-{% endblock content_admin %}
+
+       setTimeout("atualizaRelogio()",1000);
+
+
+       }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+</body>
+</html>

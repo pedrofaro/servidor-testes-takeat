@@ -135,24 +135,55 @@ def ver_relatorios(request):
 	return render(request, 'onshop_auto/ver_relatorios.html', {'qtde_novos_pedidos': qtde_novos_pedidos, 'qtde_pedidos_andamento': qtde_pedidos_andamento, 'qtde_pedidos_finalizados': qtde_pedidos_finalizados, 'qtde_mensagens': qtde_mensagens })
 
 def relatorio_por_produto(request):
+	# Filtro de datas
+	filtro_data = "Hoje"
+
+	filtro_data_req = request.GET.get('filtro_data')
+	if filtro_data_req == "1":
+		filtro_data = "Hoje"
+		data_min = date.today()
+		data_max = date.today()
+
+	elif filtro_data_req == "2":
+		data_min = date.today() - timedelta(7)
+		data_max = date.today()
+		filtro_data = "Últimos 7 dias (" + data_min.strftime('%d/%m/%Y') + " a " + data_max.strftime('%d/%m/%Y') + ")"
+
+	elif filtro_data_req == "3":
+		data_min = date.today() - timedelta(30)
+		data_max = date.today()
+		filtro_data = "Últimos 30 dias (" + data_min.strftime('%d/%m/%Y') + " a " + data_max.strftime('%d/%m/%Y') + ")"
+
+	elif filtro_data_req == None:
+		data_max_req = request.GET.get('date_template_max')
+		data_min_req = request.GET.get('date_template_min')
+
+		if data_max_req == None or data_min_req == None or data_max_req == '' or data_min_req == '':
+			filtro_data = "Hoje"
+			data_min = date.today()
+			data_max = date.today()
+
+		elif data_max_req <> None and data_min_req <> None and data_max_req <> '' and data_min_req <> '':
+			data_min = datetime.strptime(data_min_req, '%Y-%m-%d').date()
+			data_max = datetime.strptime(data_max_req, '%Y-%m-%d').date()
+			filtro_data = "Período de " + data_min.strftime('%d/%m/%Y') + " a " + data_max.strftime('%d/%m/%Y')
+
+
 	pedidos = ItemPedidoAuto.objects.all()
 	produtos = ProdutoAuto.objects.all()
 	categorias = CategoriaAuto.objects.all()
-
-	data_max = request.GET.get('date_template_max')
-	data_min = request.GET.get('date_template_min')
 
 	lista = []
 	data_filtro = []
 
 	#filtrando as datas
-	data_filtro.append([data_min, data_max])
+	#data_filtro.append([data_min, data_max])
 
-	if data_min != '' and data_min is not None:
-		if data_max != '' and data_max is not None:
-			pedidos = pedidos.filter(hora_criacao__date__range = [data_min, data_max])
-		else:
-			pedidos = pedidos.filter(hora_criacao__date=data_min)
+	#if data_min != '' and data_min is not None:
+		#if data_max != '' and data_max is not None:
+			#pedidos = pedidos.filter(hora_criacao__date__range = [data_min, data_max])
+		#else:
+			#pedidos = pedidos.filter(hora_criacao__date=data_min)
 
 	#contando os produtos e o valor
 	total_produto = 0
@@ -176,6 +207,8 @@ def relatorio_por_produto(request):
 	for pedido in pedidos:
 		if pedido.complemento not in complementos and pedido.complemento != '':
 			complementos.append(pedido.complemento)
+
+	print(pedidos)
 
 	lista_complementos = [] #lista com complemente, total de vezes pedido e total arrecadado por complemento
 	lista_complementos_total = [] #lista com o valor total de vezes pedidos e total arrecadado de todos os complementos
@@ -202,31 +235,57 @@ def relatorio_por_produto(request):
 	total_produto_com_complemento = total_produto + count_complemento_total
 	total_preco_produto_com_complemento = total_preco_produto + count_preco_complemento_total
 
+	grafico_valores = []
+	grafico_categorias = []
+
 	for categoria in categorias:
 		count_categoria = 0
 		count_categoria_preco = 0
+
+		#grafico
+		if categoria.nome not in grafico_categorias:
+			grafico_categorias.append(str(categoria.nome))
+			#print(categoria.nome)
+
 		for pedido in pedidos:
 			if pedido.produto.categoria == categoria:
 				count_categoria = count_categoria + pedido.quantidade
 				count_categoria_preco = count_categoria_preco + (pedido.quantidade * pedido.preco_produto)
 
-		porcentagem_categoria = count_categoria / total_produto_com_complemento * 100
-		porcentagem_categoria_preco = count_categoria_preco / total_preco_produto_com_complemento * 100
+		porcentagem_categoria = 0
+		porcentagem_categoria_preco = 0
 
-		porcentagem_categoria = "%.2f" % (porcentagem_categoria)
-		porcentagem_categoria_preco = "%.2f" % (porcentagem_categoria_preco)
+		if total_produto_com_complemento <> 0 and total_preco_produto_com_complemento <> 0:
+			porcentagem_categoria = (Decimal(count_categoria) / Decimal(total_produto_com_complemento)) * 100
+			porcentagem_categoria_preco = (count_categoria_preco / total_preco_produto_com_complemento) * 100
+
+
+			porcentagem_categoria = "%.2f" % (porcentagem_categoria)
+			porcentagem_categoria_preco = "%.2f" % (porcentagem_categoria_preco)
 
 		if not count_categoria == 0:
+			#grafico
+			grafico_valores.append(int(count_categoria))
+
 			lista_totais_categoria.append(
 				[categoria, count_categoria, count_categoria_preco, porcentagem_categoria, porcentagem_categoria_preco])
 
-	porcentagem_complemento = count_complemento_total / total_produto_com_complemento * 100
-	porcentagem_complemento_preco = count_preco_complemento_total / total_preco_produto_com_complemento * 100
+	porcentagem_complemento = 0
+	porcentagem_complemento_preco = 0
 
-	porcentagem_complemento = "%.2f" % (porcentagem_complemento)
-	porcentagem_complemento_preco = "%.2f" % (porcentagem_complemento_preco)
+	if total_produto_com_complemento <> 0 and total_preco_produto_com_complemento <> 0:
+		porcentagem_complemento = Decimal(count_complemento_total) / Decimal(total_produto_com_complemento) * 100
+		porcentagem_complemento_preco = Decimal(count_preco_complemento_total) / Decimal(total_preco_produto_com_complemento) * 100
 
-	print(lista_complementos_total)
+		porcentagem_complemento = "%.2f" % (porcentagem_complemento)
+		porcentagem_complemento_preco = "%.2f" % (porcentagem_complemento_preco)
+
+
+
+
+	print(grafico_categorias)
+	print(grafico_valores)
+
 
 	return render(request, 'onshop_auto/relatorio_por_produto.html', {'lista': lista,
 																	  'dataa': data_filtro,
@@ -239,7 +298,10 @@ def relatorio_por_produto(request):
 																	  'total_complemento': count_complemento_total,
 																	  'porcentagem_complemento': porcentagem_complemento,
 																	  'porcentagem_complemento_preco': porcentagem_complemento_preco,
-																	  'total_preco_complemento': count_preco_complemento_total})
+																	  'total_preco_complemento': count_preco_complemento_total,
+																	  'filtro_data': filtro_data,
+																	  'grafico_categorias': grafico_categorias,
+																	  'grafico_valores': grafico_valores})
 
 
 def relatorio_de_clientes(request):
