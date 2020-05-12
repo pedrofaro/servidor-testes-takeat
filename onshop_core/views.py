@@ -8,6 +8,7 @@ from decimal import Decimal
 from datetime import datetime
 import pytz #Apenas para poder usar o timezone
 from django.urls import reverse
+import random
 
 from .models import Categoria, Atributo, Produto, Estabelecimento, Pergunta, Resposta, ComplementoModelo, PerguntaModelo, RespostaModelo, Pedido, ProdutoPedido, CompradorPedido, LocalRetiradaPedido, OpcaoPagamento, BairrosAtendidos, Relatorio, PushSignal, PPedidos, PMesa, PFormasPag, PPedidosFormaPag, PProduto
 from .forms import CategoriaForm, AtributoForm, ProdutoForm, EstabelecimentoForm, PerfilForm, PerguntaForm, RespostaForm, ProdutoMobileForm, ComplementoModeloForm, PerguntaModeloForm, RespostaModeloForm, AtribuirForm, ContatoForm, LocalRetiradaPedidoForm, BairroForm, AcessarForm, PushSignalForm, PMesaModelForm, PProdutoModelForm, PFormasPagModelForm, PPedidosFormaPagModelForm
@@ -181,34 +182,56 @@ def retirada(request): #View intermediária para setar a escolha de retirada loc
 		retirada.delete()
 
 
-	def PicPay():
+	return redirect('onshop_core:contato')
 
-		urlCallBack = "https://seusite.com/notification.php" #mudar
-		urlReturn = "https://seusite.com/user" #mudar
-		x_picpay_token = "97ca34a3-3940-4d0c-b539-1000de999c9e"
-		x_seller_token = "88aa829c-742c-48b3-b974-05ef50668e37"
+def picpay(request):
+	try:
+		pedido = get_object_or_404(Pedido, session_key=request.session.session_key, status=Pedido.PEDIDO_CARRINHO)
+	except:
+		return redirect('onshop_core:cardapio_inicial')
 
-		def requestPayment(pedido):
-			data = {
-				'referenceId': pedido.session_key,
-				'callbackUrl': urlCallBack,
-				'returnUrl': urlReturn,
-				'value': pedido.total,
-				'buyer': {
-					'firstName': pedido.comprador.nome,
-					'lastName': pedido.comprador.nome,
-					'document': '000.000.000-00',
-					'email': pedido.comprador.email,
-					'phone': pedido.comprador.telefone, }
-			}
+	num_cod = random.randrange(1, 100000)
 
-			headers = {'x-picpay-token': x-picpay-token}
+	urlCallBack = "http://127.0.0.1:8000/on/t-etapa/?cod="+str(num_cod) #mudar
+	urlReturn = urlCallBack #mudar
 
-			r = requests.post('https://appws.picpay.com/ecommerce/public/payments', headers=headers, data=data)
+	api_token = '97ca34a3-3940-4d0c-b539-1000de999c9e'
+	api_url_base = 'https://appws.picpay.com/ecommerce/public/payments'
+	x_seller_token = "88aa829c-742c-48b3-b974-05ef50668e37"
 
-			return r
+	headers = {'Content-Type': 'application/json',
+			   'x-picpay-token': api_token}
 
-	return redirect('onshop_core:contato') 
+	def requestPayment(pedido):
+
+		valor = pedido.total
+		print(valor)
+
+		dados = json.dumps({'referenceId': str(num_cod),'callbackUrl': urlCallBack, 'returnUrl': urlCallBack, 'value': Decimal(valor), 'buyer': {
+    	'firstName': pedido.comprador.nome ,'lastName': pedido.comprador.sobrenome , 'document': '000.000.000-00','email': pedido.comprador.email,'phone': pedido.comprador.telefone
+    	}}, cls=DjangoJSONEncoder)
+
+		#dados = json.dump('value', valor, cls=DjangoJSONEncoder) #append({'value':valor}, cls=DjangoJSONEncoder)
+		print(dados)
+
+		response = requests.post(api_url_base, headers=headers, data=dados)
+		print(response.content)
+
+		if response.status_code == 200:
+			return json.loads(response.content.decode('utf-8'))
+		else:
+			return None
+
+	account_info = requestPayment(pedido)
+
+	if account_info is not None:
+		print("Aqui estao suas informacoes: ")
+		linkPicpay = account_info['paymentUrl']
+
+	else:
+		print('[!] Solicitacao invalida')
+
+	return render(request, 'onshop_core/picpay_request.html', {'infos': linkPicpay})
 
 def contato(request):
 	try:
@@ -258,6 +281,7 @@ def contato(request):
 
 	return render(request, 'onshop_core/contato.html', {'form': contato_form})
 
+
 def pagamento(request):
 	try:
 		pedido = get_object_or_404(Pedido, session_key=request.session.session_key, status=Pedido.PEDIDO_CARRINHO)
@@ -276,7 +300,36 @@ def pagamento(request):
 	estabelecimento = Estabelecimento.objects.all()[0]
 	observacao = estabelecimento.observacao
 
-	return render(request, 'onshop_core/pagamento.html', {'total': total, 'observacao':observacao})
+	#Picpay
+	status_pag_picpay = False
+	cod_num = request.GET.get('cod')
+	if cod_num != None:
+		api_token = '97ca34a3-3940-4d0c-b539-1000de999c9e'
+		x_seller_token = "88aa829c-742c-48b3-b974-05ef50668e37"
+
+		headers = {'Content-Type': 'application/json',
+				   'x-picpay-token': api_token}
+
+		def statusPayment(pedido):
+			response_status = requests.get('https://appws.picpay.com/ecommerce/public/payments/' + cod_num + '/status', headers=headers)
+			print(response_status.content)
+			if response_status.status_code == 200:
+				return json.loads(response_status.content.decode('utf-8'))
+			else:
+				return None
+
+		statusPic = statusPayment(pedido)
+		if statusPic is not None:
+			if statusPic['status'] == 'paid':
+				status_pag_picpay = True
+			else:
+				status_pag_picpay = False
+
+		else:
+			print('[!] Solicitacao invalida')
+
+	print(status_pag_picpay)
+	return render(request, 'onshop_core/pagamento.html', {'total': total, 'observacao':observacao, 'status_pag': status_pag_picpay})
 
 def confirmacao(request):
 	try:
@@ -1403,6 +1456,18 @@ def setar_pagamento(request, opcao):#Recebe se cartão ou dinheiro
 			pedido.opcao_pagamento.save()
 		else:
 			opcao_pagamento = OpcaoPagamento.objects.create(forma='Cartão')
+			pedido.opcao_pagamento = opcao_pagamento
+
+		pedido.save()
+
+	if opcao == 'picpay':
+
+		if pedido.opcao_pagamento:
+			pedido.opcao_pagamento.forma = 'Picpay'
+			pedido.opcao_pagamento.troco = ''
+			pedido.opcao_pagamento.save()
+		else:
+			opcao_pagamento = OpcaoPagamento.objects.create(forma='Picpay')
 			pedido.opcao_pagamento = opcao_pagamento
 
 		pedido.save()

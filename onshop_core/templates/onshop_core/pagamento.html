@@ -12,6 +12,7 @@
     {% block stylesheet %}
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Nunito+Sans" rel="stylesheet">
+        <script type="text/javascript"> jQuery(window).load(function($){ Confere(); }); </script>
     {% endblock stylesheet %}
     {% block head_javascript %}
     {% endblock head_javascript %}
@@ -38,6 +39,7 @@
                 <p class="total_pedido">R$ {{ total }}</p>
             </div>
             <div class="opcoes_pagamentos">
+                {%if status_pag == False%}
                 <a onclick="EscolhaOption(event, 'dinheiro')" href="#" class="pgto_opcao">
                     <div class="escolha">
                         <p class="icn_dinheiro">Dinheiro</p>
@@ -50,6 +52,17 @@
                         <p>R$ {{ total }}</p>
                     </div>
                 </a>
+                <a onclick="EscolhaOption(event, 'picpay')" {%if status_pag == False%} href="{% url 'onshop_core:picpay' %}" {%else%} href="#" {%endif%} class="pgto_opcao">
+                    <div class="escolha">
+                        <p class="icn_cartao">Picpay</p>
+                        {%if status_pag == True%}
+                            <p style="color: green;">Pago!</p>
+                        {%else%}
+                            <p>R$ {{ total }}</p>
+                        {%endif%}
+                    </div>
+                </a>
+                {%endif%}
                 {% if observacao %}<p class="pagamento_observacao">{{ observacao }}</p>{% endif %}
                 <div class="troco" style="display: none;">
                     <form id="form_troco" meio="" method="post">
@@ -60,6 +73,10 @@
                     </form>
                 </div>
             </div>
+            {%if status_pag == True%}
+                <h3 style="padding-top: 50px; color: green;">Pagamento feito pelo Picpay com sucesso!</h3>
+                <h3 style="color:green;"> Selecione "Continuar" abaixo para concluir sua compra.</h3>
+            {%endif%}
         </div>
         <div id="footer">
             <div id="container_compra">
@@ -67,6 +84,9 @@
                     <a href="{% url 'onshop_core:contato' %}">Voltar</a>
                 </div>
                 <div class="botao_fechar_pedido">
+                    {% if status_pag == True%}
+                    <label class="btn_fechar" for="submit-form" tabindex="0">Continuar</label>
+                    {% endif%}
                 </div>
             </div>
         </div>
@@ -78,6 +98,11 @@
     {% endblock javascript_base %}
     {% block tail_javascript %}
     <script>
+    function Confere(){
+        if ({{status_pag}} == True){
+            document.getElementsByClassName("botao_fechar_pedido")[0].innerHTML = "<label class=" + "btn_fechar" + " for=" +"submit-form" +" tabindex="+"0"+ ">Continuar</label>"
+        }
+    }
     function EscolhaOption(evt, nomeaba) {
         var i;
         tablinks = document.getElementsByClassName("pgto_opcao");
@@ -96,7 +121,10 @@
             document.getElementById("form_troco").reset();
             document.getElementById("form_troco").setAttribute("url", "{% url 'onshop_core:setar_pagamento' 'cartao' %}");            
             document.getElementsByClassName("botao_fechar_pedido")[0].innerHTML = "<label class=" + "btn_fechar" + " for=" +"submit-form" +" tabindex="+"0"+ ">Continuar</label>"
-
+        }if (nomeaba == 'picpay'){
+            document.getElementsByClassName("troco")[0].style.display = "none";
+            document.getElementById("form_troco").reset();
+            document.getElementById("form_troco").setAttribute("url", "{% url 'onshop_core:setar_pagamento' 'picpay' %}");
         };
     };
     </script>

@@ -83,5 +83,6 @@ urlpatterns = [
     url(r'^pagamento/(?P<opcao>[-\w]+)/$', views.setar_pagamento, name='setar_pagamento'), #View de Configuração de forma pagamento
     url(r'^api/$', views.api, name='api'), #View de Teste para Futura API
     url(r'^analisa-pedido/$', views.analisa_pedido, name='analisa_pedido'), #Chamada ajax para analisar se pode ser feito o pedido
+    url(r'^picpay_request/', views.picpay, name='picpay'),
    ]
   
