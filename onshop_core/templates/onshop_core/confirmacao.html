@@ -53,6 +53,16 @@
                     <p>Total</p>
                     <p>R$ {{ pedido.total }}</p>
                 </div>
+                <div>
+                    {%if pedido.opcao_pagamento.forma == "Picpay"%}
+                        {%if status_pag == False%}
+                        <button type="button" href="{% url 'onshop_core:picpay' %}" class="btn btn-success">Success</button>
+                        {%else%}
+                        <h3 style="padding-top: 50px; color: green;">Pagamento feito pelo Picpay com sucesso!</h3>
+                        <h3 style="color:green;"> Selecione "Fazer Pedido" abaixo para concluir sua compra.</h3>
+                        {%endif%}
+                    {%endif%}
+                </div>
             </div>
             <div id="retirada" class="resultado_abas detalhes" style="display:none">
                 <p class="nome_detalhes">{{ pedido.comprador.nome }} {{ pedido.comprador.sobrenome }}</p>
@@ -77,14 +87,16 @@
                     <a href="{% url 'onshop_core:pagamento' %}">Voltar</a>
                 </div>
                 <div class="botao_fechar_pedido">
+                    {% if pedido.opcao_pagamento.forma == "Dinheiro" or pedido.opcao_pagamento.forma == "Cartão" or status_pag == True%}
                     <a id="btn_analisa_pedido" href="#">Fazer Pedido</a>
-                    {% comment %}
-                    {% if pedido.quantidade_itens or pedido.total %}
-                    <a href="{% url 'onshop_core:concluir_pedido' %}">Confirmar Pedido</a>
-                    {% else %}
-                    <a href="">Confirmar Pedido</a>
+                        {% comment %}
+                        {% if pedido.quantidade_itens or pedido.total %}
+                        <a href="{% url 'onshop_core:concluir_pedido' %}">Confirmar Pedido</a>
+                        {% else %}
+                        <a href="">Confirmar Pedido</a>
+                        {% endif %}
+                        {% endcomment %}
                     {% endif %}
-                    {% endcomment %}
                 </div>
             </div>
         </div>
