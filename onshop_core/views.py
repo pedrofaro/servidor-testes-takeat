@@ -296,7 +296,7 @@ def pagamento(request):
 	estabelecimento = Estabelecimento.objects.all()[0]
 	observacao = estabelecimento.observacao
 
-	return render(request, 'onshop_core/pagamento.html', {'total': total, 'observacao':observacao})
+	return render(request, 'onshop_core/pagamento.html', {'total': total, 'observacao':observacao, 'statuspicpay': statuspicpay})
 
 def confirmacao(request):
 	try:
@@ -310,7 +310,7 @@ def confirmacao(request):
 	estabelecimento = Estabelecimento.objects.all()[0]
 
 	if pedido.opcao_pagamento.forma == "Picpay":
-		status_pag_picpay = False
+		status_pag_picpay = [False]
 		def statusPayment(pedido):
 			response_status = requests.get('https://appws.picpay.com/ecommerce/public/payments/' + pedido.session_key + '/status',
 										   headers=headers)

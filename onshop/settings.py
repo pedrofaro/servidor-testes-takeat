@@ -124,10 +124,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-STATIC_ROOT = '/var/www/onshop/static/'
+STATIC_ROOT = '/var/www/takeat/static/'
 STATIC_URL = '/static/'
 
-MEDIA_ROOT = '/var/www/onshop/media/'
+MEDIA_ROOT = '/var/www/takeat/media/'
 MEDIA_URL = '/media/'
 
 LOGIN_URL = '/on/painel/'

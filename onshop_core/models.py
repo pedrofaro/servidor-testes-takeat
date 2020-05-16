@@ -286,6 +286,7 @@ class Pedido(models.Model):
 	produtos = models.ManyToManyField('ProdutoPedido', blank=True)
 	quantidade_itens = models.IntegerField(default=0, null=True,blank=True) #Para poder atualizar a barra footer do cliente
 	total = models.DecimalField(default=0,null=True, blank=True, max_digits=8, decimal_places=2)
+	status_picpay = models.BooleanField(default=False, blank=False)
 
 	retirada = models.ForeignKey(LocalRetiradaPedido, blank=True, null=True)
 	comprador = models.ForeignKey(CompradorPedido, blank=True, null=True)
