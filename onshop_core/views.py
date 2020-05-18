@@ -296,7 +296,7 @@ def pagamento(request):
 	estabelecimento = Estabelecimento.objects.all()[0]
 	observacao = estabelecimento.observacao
 
-	return render(request, 'onshop_core/pagamento.html', {'total': total, 'observacao':observacao, 'statuspicpay': statuspicpay})
+	return render(request, 'onshop_core/pagamento.html', {'total': total, 'observacao':observacao})
 
 def confirmacao(request):
 	try:
@@ -310,7 +310,7 @@ def confirmacao(request):
 	estabelecimento = Estabelecimento.objects.all()[0]
 
 	if pedido.opcao_pagamento.forma == "Picpay":
-		status_pag_picpay = [False]
+		status_pag_picpay = False
 		def statusPayment(pedido):
 			response_status = requests.get('https://appws.picpay.com/ecommerce/public/payments/' + pedido.session_key + '/status',
 										   headers=headers)
@@ -330,7 +330,7 @@ def confirmacao(request):
 		else:
 			print('[!] Solicitacao invalida')
 
-	return render(request, 'onshop_core/confirmacao.html', { 'pedido':pedido, 'estabelecimento':estabelecimento, 'status_pag_picpay': status_pag_picpay })
+	return render(request, 'onshop_core/confirmacao.html', { 'pedido':pedido, 'estabelecimento':estabelecimento})
 
 def remover_pedido(request, pedido_id, produtopedido_id, flag=None):
 	pedido = get_object_or_404(Pedido, id=pedido_id)

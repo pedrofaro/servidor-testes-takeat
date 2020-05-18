@@ -54,6 +54,7 @@
                     <p>R$ {{ pedido.total }}</p>
                 </div>
                 <div>
+                    <p>status: {{pedido.status_picpay}}</p>
                     {%if pedido.opcao_pagamento.forma == "Picpay"%}
                         {%if status_pag_picpay == False%}
                         <button type="button" href="{% url 'onshop_core:picpay' %}" class="btn btn-success">Pagar pelo Picpay</button>
