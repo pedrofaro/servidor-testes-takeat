@@ -296,7 +296,7 @@ def pagamento(request):
 	estabelecimento = Estabelecimento.objects.all()[0]
 	observacao = estabelecimento.observacao
 
-	return render(request, 'onshop_core/pagamento.html', {'total': total, 'observacao':observacao})
+	return render(request, 'onshop_core/pagamento.html', {'total': total, 'observacao':observacao, 'pedido':pedido})
 
 def confirmacao(request):
 	try:
@@ -310,10 +310,15 @@ def confirmacao(request):
 	estabelecimento = Estabelecimento.objects.all()[0]
 
 	if pedido.opcao_pagamento.forma == "Picpay":
-		status_pag_picpay = False
+		api_token = '97ca34a3-3940-4d0c-b539-1000de999c9e'
+		api_url_base = 'https://appws.picpay.com/ecommerce/public/payments'
+		x_seller_token = "88aa829c-742c-48b3-b974-05ef50668e37"
+
+		headers = {'Content-Type': 'application/json',
+				   'x-picpay-token': api_token}
+
 		def statusPayment(pedido):
-			response_status = requests.get('https://appws.picpay.com/ecommerce/public/payments/' + pedido.session_key + '/status',
-										   headers=headers)
+			response_status = requests.get('https://appws.picpay.com/ecommerce/public/payments/' + pedido.session_key + '/status', headers=headers)
 			print(response_status.content)
 			if response_status.status_code == 200:
 				return json.loads(response_status.content.decode('utf-8'))
@@ -323,12 +328,9 @@ def confirmacao(request):
 		statusPic = statusPayment(pedido)
 		if statusPic is not None:
 			if statusPic['status'] == 'paid':
-				status_pag_picpay = True
-			else:
-				status_pag_picpay = False
-
-		else:
-			print('[!] Solicitacao invalida')
+				pedido.status_picpay = True
+				pedido.save()
+		print(pedido.status_picpay)
 
 	return render(request, 'onshop_core/confirmacao.html', { 'pedido':pedido, 'estabelecimento':estabelecimento})
 

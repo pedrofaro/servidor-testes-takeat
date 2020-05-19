@@ -51,9 +51,8 @@
                         <p>R$ {{ total }}</p>
                     </div>
                 </a>
-                <a onclick="EscolhaOption(event, 'picpay')" href="#" class="pgto_opcao">
+                <a onclick="EscolhaOption(event, 'picpay');popup();"href="#popup" class="pgto_opcao">
                     <div class="escolha">
-                        <p>{{statuspicpay}}</p>
                         <p class="icn_cartao">Picpay</p>
                         <p>R$ {{ total }}</p>
                     </div>
@@ -69,11 +68,13 @@
                 </div>
             </div>
 
+
+
         </div>
         <div id="footer">
             <div id="container_compra">
                 <div class="botao_voltar_tela">
-                    <a href="{% url 'onshop_core:contato' %}">Voltar</a>
+                    <a href="{% url 'onshop_core:contato' %}">{{pedido.status_picpay}}</a>
                 </div>
                 <div class="botao_fechar_pedido">
                 </div>
@@ -155,6 +156,12 @@
                 }
             })
         });
+    </script>
+
+    <script languague="javascript">
+    function popup(){
+      window.open('{%url 'onshop_core:picpay'%}','popup','width=200,height=100,scrolling=auto,top=0,left=0')
+    }
     </script>
 
     {% block analytics %}
