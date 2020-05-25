@@ -18,7 +18,7 @@
     {% endblock head_javascript %}
     </head>
     {% block body_sistema %}
-    <body>
+    <body {%if pedido.link_picpay != '#'%} onload="EscolhaOption(event, 'picpay');" {%endif%}>
     {% endblock body_sistema %}
     {% block body %}
     <div id="container">
@@ -57,6 +57,7 @@
                         <p>R$ {{ total }}</p>
                     </div>
                 </a>
+
                 {% if observacao %}<p class="pagamento_observacao">{{ observacao }}</p>{% endif %}
                 <div class="troco" style="display: none;">
                     <form id="form_troco" meio="" method="post">

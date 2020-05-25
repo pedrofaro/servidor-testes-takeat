@@ -9,6 +9,7 @@ from datetime import datetime
 import pytz #Apenas para poder usar o timezone
 from django.urls import reverse
 import random
+from random import randint
 
 from .models import Categoria, Atributo, Produto, Estabelecimento, Pergunta, Resposta, ComplementoModelo, PerguntaModelo, RespostaModelo, Pedido, ProdutoPedido, CompradorPedido, LocalRetiradaPedido, OpcaoPagamento, BairrosAtendidos, Relatorio, PushSignal, PPedidos, PMesa, PFormasPag, PPedidosFormaPag, PProduto
 from .forms import CategoriaForm, AtributoForm, ProdutoForm, EstabelecimentoForm, PerfilForm, PerguntaForm, RespostaForm, ProdutoMobileForm, ComplementoModeloForm, PerguntaModeloForm, RespostaModeloForm, AtribuirForm, ContatoForm, LocalRetiradaPedidoForm, BairroForm, AcessarForm, PushSignalForm, PMesaModelForm, PProdutoModelForm, PFormasPagModelForm, PPedidosFormaPagModelForm
@@ -190,7 +191,6 @@ def picpay(request):
 	except:
 		return redirect('onshop_core:cardapio_inicial')
 
-	num_cod = random.randrange(1, 100000)
 
 	urlCallBack = "http://127.0.0.1:8000/on/t-etapa/?cod="+pedido.session_key
 	urlReturn = urlCallBack #mudar
@@ -207,7 +207,7 @@ def picpay(request):
 		valor = pedido.total
 		print(valor)
 
-		dados = json.dumps({'referenceId': pedido.session_key,'callbackUrl': urlCallBack, 'returnUrl': urlCallBack, 'value': Decimal(valor), 'buyer': {
+		dados = json.dumps({'referenceId': pedido.id_picpay,'callbackUrl': urlCallBack, 'returnUrl': urlCallBack, 'value': Decimal(valor), 'buyer': {
     	'firstName': pedido.comprador.nome ,'lastName': pedido.comprador.sobrenome , 'document': '000.000.000-00','email': pedido.comprador.email,'phone': pedido.comprador.telefone
     	}}, cls=DjangoJSONEncoder)
 
@@ -224,11 +224,14 @@ def picpay(request):
 	if account_info is not None:
 		print("Aqui estao suas informacoes: ")
 		linkPicpay = account_info['paymentUrl']
+		if pedido.link_picpay == '#':
+			pedido.link_picpay = linkPicpay = account_info['paymentUrl']
+			pedido.save()
 
 	else:
 		print('[!] Solicitacao invalida')
 
-	return render(request, 'onshop_core/picpay_request.html', {'link': linkPicpay})
+	return render(request, 'onshop_core/picpay_request.html', {'pedido': pedido})
 
 def contato(request):
 	try:
@@ -295,6 +298,14 @@ def pagamento(request):
 
 	estabelecimento = Estabelecimento.objects.all()[0]
 	observacao = estabelecimento.observacao
+
+	id_picpay_local = randint(0,10000000)
+	if pedido.id_picpay == '0':
+		pedido.id_picpay = str(id_picpay_local)
+		pedido.save()
+
+	print(id_picpay_local)
+	print(pedido.id_picpay)
 
 	return render(request, 'onshop_core/pagamento.html', {'total': total, 'observacao':observacao, 'pedido':pedido})
 

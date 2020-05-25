@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c254ae15-6b74-40df-910c-15fbb23dd62d" name="Default Changelist" comment="" />
+    <list default="true" id="c254ae15-6b74-40df-910c-15fbb23dd62d" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/onshop_core/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/onshop_core/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/onshop_core/templates/onshop_core/pagamento.html" beforeDir="false" afterPath="$PROJECT_DIR$/onshop_core/templates/onshop_core/pagamento.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/onshop_core/templates/onshop_core/picpay_request.html" beforeDir="false" afterPath="$PROJECT_DIR$/onshop_core/templates/onshop_core/picpay_request.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/onshop_core/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/onshop_core/views.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -35,6 +42,7 @@
     <servers />
   </component>
   <component name="hg4idea.settings">
+    <option name="CHECK_INCOMING_OUTGOING" value="true" />
     <option name="RECENT_HG_ROOT_PATH" value="$PROJECT_DIR$/onshop_auto" />
   </component>
 </project>

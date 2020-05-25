@@ -287,6 +287,8 @@ class Pedido(models.Model):
 	quantidade_itens = models.IntegerField(default=0, null=True,blank=True) #Para poder atualizar a barra footer do cliente
 	total = models.DecimalField(default=0,null=True, blank=True, max_digits=8, decimal_places=2)
 	status_picpay = models.BooleanField(default=False, blank=False)
+	link_picpay = models.CharField(default='#', max_length=200)
+	id_picpay = models.CharField(default='0', max_length=50)
 
 	retirada = models.ForeignKey(LocalRetiradaPedido, blank=True, null=True)
 	comprador = models.ForeignKey(CompradorPedido, blank=True, null=True)
