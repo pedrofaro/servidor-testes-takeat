@@ -54,7 +54,7 @@
                     <p>R$ {{ pedido.total }}</p>
                 </div>
                 <div>
-                    <p>status: {{pedido.status_picpay}}</p>
+
                     {%if pedido.opcao_pagamento.forma == "Picpay"%}
                         {%if pedido.status_picpay == False%}
                             <h3 style="padding-top: 50px; color: red;">Deu ruim :( Se voce ja pagou atualize a pagina, se não, volte e escolha outro metodo!</h3>
