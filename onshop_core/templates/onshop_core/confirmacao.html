@@ -57,7 +57,7 @@
                     <p>status: {{pedido.status_picpay}}</p>
                     {%if pedido.opcao_pagamento.forma == "Picpay"%}
                         {%if pedido.status_picpay == False%}
-                            <h3>Deu ruim :( Se voce ja pagou atualize a pagina, se não, volte e escolha outro metodo!</h3>
+                            <h3 style="padding-top: 50px; color: red;">Deu ruim :( Se voce ja pagou atualize a pagina, se não, volte e escolha outro metodo!</h3>
                         {%else%}
                         <h3 style="padding-top: 50px; color: green;">Pagamento feito pelo Picpay com sucesso!</h3>
                         <h3 style="color:green;"> Selecione "Fazer Pedido" abaixo para concluir sua compra.</h3>

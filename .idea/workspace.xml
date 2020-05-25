@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c254ae15-6b74-40df-910c-15fbb23dd62d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/onshop_core/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/onshop_core/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/onshop_core/templates/onshop_core/pagamento.html" beforeDir="false" afterPath="$PROJECT_DIR$/onshop_core/templates/onshop_core/pagamento.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/onshop_core/templates/onshop_core/picpay_request.html" beforeDir="false" afterPath="$PROJECT_DIR$/onshop_core/templates/onshop_core/picpay_request.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/onshop_core/templates/onshop_core/confirmacao.html" beforeDir="false" afterPath="$PROJECT_DIR$/onshop_core/templates/onshop_core/confirmacao.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/onshop_core/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/onshop_core/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

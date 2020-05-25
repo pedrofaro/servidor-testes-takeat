@@ -329,7 +329,7 @@ def confirmacao(request):
 				   'x-picpay-token': api_token}
 
 		def statusPayment(pedido):
-			response_status = requests.get('https://appws.picpay.com/ecommerce/public/payments/' + pedido.session_key + '/status', headers=headers)
+			response_status = requests.get('https://appws.picpay.com/ecommerce/public/payments/' + pedido.id_picpay + '/status', headers=headers)
 			print(response_status.content)
 			if response_status.status_code == 200:
 				return json.loads(response_status.content.decode('utf-8'))
